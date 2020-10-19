@@ -39,6 +39,7 @@ final class YUKLockTests: XCTestCase {
     XCTAssertEqual(value, dispatchBlockCount * iterationCountPerBlock)
   }
   
+  // MARK: - API
   // MARK:
   override func setUp() {
     super.setUp()
