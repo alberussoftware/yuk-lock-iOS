@@ -12,7 +12,7 @@ YUKLock is available through [Swift Package Manger](https://github.com/apple/swi
 it, simply add the following line to the dependencies in your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/alberussoftware/yuk-lock-iOS"),
+.package(url: "https://github.com/alberussoftware/yuk-lock-iOS", .branch("master"))
 ```
 
 ### CocoaPods
