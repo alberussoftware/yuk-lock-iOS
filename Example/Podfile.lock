@@ -1,0 +1,16 @@
+PODS:
+  - YUKLock (0.1.0)
+
+DEPENDENCIES:
+  - YUKLock (from `../`)
+
+EXTERNAL SOURCES:
+  YUKLock:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  YUKLock: 37f2b73d393abfeeddecc8535ff06583b71bf9fa
+
+PODFILE CHECKSUM: 4277d8da22ac93d6a48c39de8cf7cb930b65e91b
+
+COCOAPODS: 1.9.3
