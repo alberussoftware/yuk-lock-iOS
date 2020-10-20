@@ -12,7 +12,7 @@ public final class UnfairLock {
   @usableFromInline
   internal private(set) var _lock: UnsafeMutablePointer<os_unfair_lock>
   
-  // MARK: - API
+  // MARK: -
   // MARK:
   @inlinable
   public func precondition(condition: Predicate) {
