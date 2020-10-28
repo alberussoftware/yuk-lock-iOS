@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name                  = 'YUKLock'
-  s.version               = '0.1.2'
+  s.version               = '0.1.3'
   s.summary               = 'Simple os_unfair_lock wrapper for iOS'
   s.homepage              = 'https://github.com/alberussoftware/yuk-lock-iOS'
   s.license               = { :type => 'Apache 2.0', :file => 'LICENSE' }
