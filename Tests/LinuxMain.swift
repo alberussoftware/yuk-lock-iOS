@@ -1,5 +1,4 @@
 import XCTest
-
 import YUKLockTests
 
 var tests = [XCTestCaseEntry]()
