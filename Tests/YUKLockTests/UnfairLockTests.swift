@@ -1,17 +1,23 @@
+//
+//  UnfairLockTests.swift
+//  YUKLockTests
+//
+//  Created by Ruslan Lutfullin on 2/7/21.
+//
+
 import XCTest
 @testable import YUKLock
 
 // MARK: -
-final class YUKLockTests: XCTestCase {
+final class UnfairLockTests: XCTestCase {
   // MARK: Private Props
   private var lock: UnfairLock!
   
   // MARK: Public Static Props
-  static var allTests = [("testUnfairLock", testLockUnlock),
+  static var allTests = [("testLockUnlock", testLockUnlock),
                          ("testSync", testSync),
                          ("testLocked", testLocked),
-                         ("testTrySync", testTrySync),
-                         ("testPrecondition", testPrecondition)]
+                         ("testTrySync", testTrySync)]
   
   // MARK: Public Methods
   override func setUp() {
@@ -27,38 +33,30 @@ final class YUKLockTests: XCTestCase {
     }
   }
   func testSync() {
-    executeLockTest { (block) in
-      self.lock.sync { block() }
-    }
+    executeLockTest { (block) in self.lock.sync { block() } }
   }
   func testLocked() {
     lock.lock()
     XCTAssertFalse(lock.locked())
     lock.unlock()
+    
     XCTAssertTrue(lock.locked())
     lock.unlock()
   }
   func testTrySync() {
     lock.lock()
-    XCTAssertNil(lock.trySync({}))
+    XCTAssertNil(lock.trySync({ }))
     lock.unlock()
-    XCTAssertNotNil(lock.trySync({}))
-  }
-  func testPrecondition() {
-    lock.lock()
-    lock.precondition(.onThreadOwner)
-    lock.unlock()
-    lock.precondition(.notOnThreadOwner)
+    XCTAssertNotNil(lock.trySync({ }))
   }
   //
   override func tearDown() {
     lock = nil
     super.tearDown()
   }
-  
 }
 
-extension YUKLockTests {
+extension UnfairLockTests {
   private func executeLockTest(performBlock: @escaping (_ block: () -> Void) -> Void) {
     let dispatchBlockCount = 16
     let iterationCountPerBlock = 100_000
