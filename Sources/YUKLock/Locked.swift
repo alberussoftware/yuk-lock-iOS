@@ -9,7 +9,7 @@
 @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, macCatalyst 13.0, *)
 @propertyWrapper
 @dynamicMemberLookup
-public final class Locked<Value, LockType: Lock> {
+public final class Locked<Value, LockType: Locking> {
   // MARK: Internal Props
   @usableFromInline internal let lock = LockType()
   @usableFromInline internal var value: Value
@@ -34,11 +34,11 @@ public final class Locked<Value, LockType: Lock> {
   public var projectedValue: Locked { self }
   
   // MARK: Public Methods
-  @inlinable public func read<T>(_ body: (Value) throws -> T) rethrows -> T?  {
-    try lock.trySync { try body(value) }
+  @inlinable public func read<T>(_ body: (Value) throws -> T) rethrows -> T  {
+    try lock.sync { try body(value) }
   }
-  @inlinable @discardableResult public func write<T>(_ body: (inout Value) throws -> T) rethrows -> T? {
-    try lock.trySync { try body(&value) }
+  @inlinable @discardableResult public func write<T>(_ body: (inout Value) throws -> T) rethrows -> T {
+    try lock.sync { try body(&value) }
   }
   
   // MARK: Public Subscripts
