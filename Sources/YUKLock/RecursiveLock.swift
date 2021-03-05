@@ -8,20 +8,23 @@
 import Darwin.POSIX.pthread
 
 // MARK: -
-@available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, macCatalyst 13.0, *)
 public final class RecursiveLock: Locking {
   // MARK: Internal Props
-  @usableFromInline internal let _lock: UnsafeMutablePointer<pthread_mutex_t>
+  @usableFromInline
+  internal let _lock: UnsafeMutablePointer<pthread_mutex_t>
   
   // MARK: Public Methods
-  @inlinable public func lock() {
+  @inlinable
+  public func lock() {
     pthread_mutex_lock(_lock)
   }
-  @inlinable public func unlock() {
+  @inlinable
+  public func unlock() {
     pthread_mutex_unlock(_lock)
   }
   //
-  @inlinable public func locked() -> Bool {
+  @inlinable
+  public func locked() -> Bool {
     pthread_mutex_trylock(_lock) == .zero
   }
   

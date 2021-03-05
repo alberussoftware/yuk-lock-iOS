@@ -6,46 +6,48 @@
 //
 
 // MARK: -
-@available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, macCatalyst 13.0, *)
 @propertyWrapper
 @dynamicMemberLookup
 public final class Locked<Value, LockType: Locking> {
   // MARK: Internal Props
-  @usableFromInline internal let lock = LockType()
-  @usableFromInline internal var value: Value
+  @usableFromInline
+  internal let lock = LockType()
+  @usableFromInline
+  internal var value: Value
   
   // MARK: Public Props
   public var wrappedValue: Value {
     _read {
       lock.lock()
-      defer {
-        lock.unlock()
-      }
+      defer { lock.unlock() }
       yield value
     }
     _modify {
       lock.lock()
-      defer {
-        lock.unlock()
-      }
+      defer { lock.unlock() }
       yield &value
     }
   }
   public var projectedValue: Locked { self }
   
   // MARK: Public Methods
-  @inlinable public func read<T>(_ body: (Value) throws -> T) rethrows -> T  {
+  @inlinable
+  public func read<T>(_ body: (Value) throws -> T) rethrows -> T  {
     try lock.sync { try body(value) }
   }
-  @inlinable @discardableResult public func write<T>(_ body: (inout Value) throws -> T) rethrows -> T {
+  @inlinable
+  @discardableResult
+  public func write<T>(_ body: (inout Value) throws -> T) rethrows -> T {
     try lock.sync { try body(&value) }
   }
   
   // MARK: Public Subscripts
-  @inlinable public subscript<Property>(dynamicMember keyPath: KeyPath<Value, Property>) -> Property {
+  @inlinable
+  public subscript<Property>(dynamicMember keyPath: KeyPath<Value, Property>) -> Property {
     lock.sync { value[keyPath: keyPath] }
   }
-  @inlinable public subscript<Property>(dynamicMember keyPath: WritableKeyPath<Value, Property>) -> Property {
+  @inlinable
+  public subscript<Property>(dynamicMember keyPath: WritableKeyPath<Value, Property>) -> Property {
     get {
       lock.sync { value[keyPath: keyPath] }
     }
@@ -53,7 +55,8 @@ public final class Locked<Value, LockType: Locking> {
       lock.sync { value[keyPath: keyPath] = newValue }
     }
   }
-  @inlinable public subscript<Property>(dynamicMember keyPath: ReferenceWritableKeyPath<Value, Property>) -> Property {
+  @inlinable
+  public subscript<Property>(dynamicMember keyPath: ReferenceWritableKeyPath<Value, Property>) -> Property {
     get {
       lock.sync { value[keyPath: keyPath] }
     }
@@ -63,15 +66,14 @@ public final class Locked<Value, LockType: Locking> {
   }
   
   // MARK: Public Inits
-  @inlinable public init(wrappedValue: Value) {
+  @inlinable
+  public init(wrappedValue: Value) {
     value = wrappedValue
   }
 }
 
 // MARK: -
-@available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, macCatalyst 13.0, *)
 public typealias UnfairLocked<Value> = Locked<Value, UnfairLock>
 
 // MARK: -
-@available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, macCatalyst 13.0, *)
 public typealias RecursiveLocked<Value> = Locked<Value, RecursiveLock>
