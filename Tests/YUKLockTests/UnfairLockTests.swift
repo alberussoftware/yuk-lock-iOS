@@ -9,33 +9,33 @@ import XCTest
 @testable import YUKLock
 
 // MARK: -
-final class UnfairLockTests: XCTestCase {
-  // MARK: Private Props
-  private var lock: UnfairLock!
-  
-  // MARK: Public Static Props
-  static var allTests = [("testLockUnlock", testLockUnlock),
+internal final class UnfairLockTests: XCTestCase {
+  // MARK: Internal Static Props
+  internal static var allTests = [("testLockUnlock", testLockUnlock),
                          ("testSync", testSync),
                          ("testLocked", testLocked),
                          ("testTrySync", testTrySync)]
   
-  // MARK: Public Methods
-  override func setUp() {
+  // MARK: Private Props
+  private var lock: UnfairLock!
+  
+  // MARK: Internal Methods
+  internal override func setUp() {
     super.setUp()
     lock = UnfairLock()
   }
   //
-  func testLockUnlock() {
+  internal func testLockUnlock() {
     executeLockTest { (block) in
       self.lock.lock()
       block()
       self.lock.unlock()
     }
   }
-  func testSync() {
+  internal func testSync() {
     executeLockTest { (block) in self.lock.sync { block() } }
   }
-  func testLocked() {
+  internal func testLocked() {
     lock.lock()
     XCTAssertFalse(lock.locked())
     lock.unlock()
@@ -43,14 +43,14 @@ final class UnfairLockTests: XCTestCase {
     XCTAssertTrue(lock.locked())
     lock.unlock()
   }
-  func testTrySync() {
+  internal func testTrySync() {
     lock.lock()
     XCTAssertNil(lock.trySync({ }))
     lock.unlock()
     XCTAssertNotNil(lock.trySync({ }))
   }
   //
-  override func tearDown() {
+  internal override func tearDown() {
     lock = nil
     super.tearDown()
   }

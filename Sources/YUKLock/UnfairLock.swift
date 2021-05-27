@@ -10,31 +10,27 @@ import Darwin.os.lock
 // MARK: -
 public final class UnfairLock: Locking {
   // MARK: Internal Props
-  @usableFromInline
-  internal let _lock: os_unfair_lock_t
+  @usableFromInline internal let unfairLock: os_unfair_lock_t
   
   // MARK: Public Methods
-  @inlinable
-  public func lock() {
-    os_unfair_lock_lock(_lock)
+  @inlinable public func lock() {
+    os_unfair_lock_lock(unfairLock)
   }
-  @inlinable
-  public func unlock() {
-    os_unfair_lock_unlock(_lock)
+  @inlinable public func unlock() {
+    os_unfair_lock_unlock(unfairLock)
   }
   //
-  @inlinable
-  public func locked() -> Bool {
-    os_unfair_lock_trylock(_lock)
+  @inlinable public func locked() -> Bool {
+    os_unfair_lock_trylock(unfairLock)
   }
   
   // MARK: Public Inits
   public init() {
-    _lock = .allocate(capacity: 1)
-    _lock.initialize(to: .init())
+    unfairLock = .allocate(capacity: 1)
+    unfairLock.initialize(to: .init())
   }
   deinit {
-    _lock.deinitialize(count: 1)
-    _lock.deallocate()
+    unfairLock.deinitialize(count: 1)
+    unfairLock.deallocate()
   }
 }

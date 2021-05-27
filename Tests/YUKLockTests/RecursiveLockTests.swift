@@ -9,33 +9,33 @@ import XCTest
 @testable import YUKLock
 
 // MARK: -
-final class RecursiveLockTests: XCTestCase {
+internal final class RecursiveLockTests: XCTestCase {
+  // MARK: Internal Static Props
+  internal static var allTests = [("testLockUnlock", testLockUnlock),
+                                  ("testSync", testSync),
+                                  ("testLocked", testLocked),
+                                  ("testTrySync", testTrySync)]
+  
   // MARK: Private Props
   private var lock: Locking!
   
-  // MARK: Public Static Props
-  static var allTests = [("testLockUnlock", testLockUnlock),
-                         ("testSync", testSync),
-                         ("testLocked", testLocked),
-                         ("testTrySync", testTrySync)]
-  
-  // MARK: Public Methods
-  override func setUp() {
+  // MARK: Internal Methods
+  internal override func setUp() {
     super.setUp()
     lock = RecursiveLock()
   }
   //
-  func testLockUnlock() {
+  internal func testLockUnlock() {
     executeLockTest { (block) in
       self.lock.lock()
       block()
       self.lock.unlock()
     }
   }
-  func testSync() {
+  internal func testSync() {
     executeLockTest { (block) in self.lock.sync { block() } }
   }
-  func testLocked() {
+  internal func testLocked() {
     lock.lock()
     XCTAssertTrue(lock.locked())
     lock.unlock()
@@ -44,14 +44,14 @@ final class RecursiveLockTests: XCTestCase {
     XCTAssertTrue(lock.locked())
     lock.unlock()
   }
-  func testTrySync() {
+  internal func testTrySync() {
     lock.lock()
     XCTAssertNotNil(lock.trySync({ }))
     lock.unlock()
     XCTAssertNotNil(lock.trySync({ }))
   }
   //
-  override func tearDown() {
+  internal override func tearDown() {
     lock = nil
     super.tearDown()
   }

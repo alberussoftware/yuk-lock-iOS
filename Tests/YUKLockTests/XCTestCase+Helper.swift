@@ -9,7 +9,7 @@ import XCTest
 
 // MARK: -
 extension XCTestCase {
-  func executeLockTest(performBlock: @escaping (_ block: () -> Void) -> Void) {
+  internal func executeLockTest(performBlock: @escaping ((_ block: () -> Void) -> Void)) {
     let dispatchBlockCount = 16
     let iterationCountPerBlock = 100_000
     let queues: [DispatchQueue] = [.global(qos: .userInteractive),
@@ -19,11 +19,11 @@ extension XCTestCase {
     
     let group = DispatchGroup()
     
-    (0..<dispatchBlockCount).forEach {
+    for i in 0..<dispatchBlockCount {
       group.enter()
-      let queue = queues[$0 % queues.count]
+      let queue = queues[i % queues.count]
       queue.async {
-        (0..<iterationCountPerBlock).forEach { (_) in
+        for _ in 0..<iterationCountPerBlock {
           performBlock {
             value += 2
             value -= 1
