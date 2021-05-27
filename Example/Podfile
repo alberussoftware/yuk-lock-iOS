@@ -1,6 +1,0 @@
-use_frameworks!
-target 'YUKLock_Tests' do
-  pod 'YUKLock', :path => '../'
-  
-  
-end
