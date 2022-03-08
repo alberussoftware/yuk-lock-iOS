@@ -9,6 +9,7 @@ import XCTest
 
 // MARK: -
 extension XCTestCase {
+  
   internal func executeLockTest(performBlock: @escaping (_ block: () -> Void) -> Void) {
     let dispatchBlockCount = 16
     let iterationCountPerBlock = 100_000

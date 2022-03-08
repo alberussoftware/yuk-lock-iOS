@@ -1,5 +1,5 @@
 //
-//  RecursiveLockTests.swift
+//  UnfairRecursiveLockTests.swift
 //  YUKLockTests
 //
 //  Created by Ruslan Lutfullin on 2/7/21.
@@ -9,7 +9,7 @@ import XCTest
 @testable import YUKLock
 
 // MARK: -
-internal final class RecursiveLockTests: XCTestCase {
+internal final class UnfairRecursiveLockTests: XCTestCase {
   // MARK: Internal Static Props
   internal static var allTests = [("testLockUnlock", testLockUnlock),
                                   ("testSync", testSync),
@@ -22,7 +22,7 @@ internal final class RecursiveLockTests: XCTestCase {
   // MARK: Internal Methods
   internal override func setUp() {
     super.setUp()
-    lock = RecursiveLock()
+    lock = UnfairRecursiveLock()
   }
   //
   internal func testLockUnlock() {
@@ -32,9 +32,11 @@ internal final class RecursiveLockTests: XCTestCase {
       self.lock.unlock()
     }
   }
+  
   internal func testSync() {
     executeLockTest { (block) in self.lock.sync { block() } }
   }
+  
   internal func testLocked() {
     lock.lock()
     XCTAssertTrue(lock.locked())
@@ -44,6 +46,7 @@ internal final class RecursiveLockTests: XCTestCase {
     XCTAssertTrue(lock.locked())
     lock.unlock()
   }
+  
   internal func testTrySync() {
     lock.lock()
     XCTAssertNotNil(lock.trySync({ }))

@@ -10,11 +10,12 @@ import XCTest
 
 // MARK: -
 internal final class UnfairLockTests: XCTestCase {
+  
   // MARK: Internal Static Props
   internal static var allTests = [("testLockUnlock", testLockUnlock),
-                         ("testSync", testSync),
-                         ("testLocked", testLocked),
-                         ("testTrySync", testTrySync)]
+                                  ("testSync", testSync),
+                                  ("testLocked", testLocked),
+                                  ("testTrySync", testTrySync)]
   
   // MARK: Private Props
   private var lock: UnfairLock!
@@ -32,9 +33,11 @@ internal final class UnfairLockTests: XCTestCase {
       self.lock.unlock()
     }
   }
+  
   internal func testSync() {
     executeLockTest { (block) in self.lock.sync { block() } }
   }
+  
   internal func testLocked() {
     lock.lock()
     XCTAssertFalse(lock.locked())
@@ -43,6 +46,7 @@ internal final class UnfairLockTests: XCTestCase {
     XCTAssertTrue(lock.locked())
     lock.unlock()
   }
+  
   internal func testTrySync() {
     lock.lock()
     XCTAssertNil(lock.trySync({ }))
