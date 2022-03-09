@@ -12,7 +12,7 @@ it, simply add the following line to the dependencies in your `Package.swift` fi
 
 ## Author
 
-jeudesprits, jeudesprits@icloud.com
+@jeudesprits, jeudesprits@icloud.com
 
 ## License
 
