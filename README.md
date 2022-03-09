@@ -16,6 +16,6 @@ jeudesprits, jeudesprits@icloud.com
 
 ## License
 
-Copyright (c) 2021 jeudesprits <jeudesprits@icloud.com>
+Copyright (c) 2022 jeudesprits <jeudesprits@icloud.com>
 
 YUKLock is available under the Apache License, Version 2.0 license. See the LICENSE file for more info.
