@@ -7,7 +7,7 @@ YUKLock is available through [Swift Package Manger](https://github.com/apple/swi
 it, simply add the following line to the dependencies in your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/alberussoftware/yuk-lock-iOS.git", .branch("master"))
+.package(url: "https://github.com/alberussoftware/yuk-lock-iOS.git", branch: "master")
 ```
 
 ## Author
