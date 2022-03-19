@@ -56,7 +56,7 @@ public final class UnfairRecursiveLock: Locking {
 
   // MARK: Internal Props
   @usableFromInline
-  internal let _lock: pthread_mutex_s
+  internal let _lock: UnsafeMutablePointer<pthread_mutex_t>
 
   // MARK: Public Methods
   @inlinable
@@ -93,8 +93,5 @@ public final class UnfairRecursiveLock: Locking {
     _lock.deallocate()
   }
 }
-
-@usableFromInline
-internal typealias pthread_mutex_s = UnsafeMutablePointer<pthread_mutex_t>
 
 #endif

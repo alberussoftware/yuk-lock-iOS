@@ -23,13 +23,15 @@ public protocol Locking: AnyObject {
 
 extension Locking {
   
-  @inlinable public func sync<R>(_ block: () throws -> R) rethrows -> R {
+  @inlinable
+  public func sync<R>(_ block: () throws -> R) rethrows -> R {
     lock()
     defer { unlock() }
     return try block()
   }
   
-  @inlinable public func trySync<R>(_ block: () throws -> R) rethrows -> R? {
+  @inlinable
+  public func trySync<R>(_ block: () throws -> R) rethrows -> R? {
     guard locked() else { return nil }
     defer { unlock() }
     return try block()
