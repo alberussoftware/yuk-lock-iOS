@@ -10,7 +10,7 @@ let package = Package(
     .macOS(.v10_15),
   ],
   products: [
-    .library(name: "YUKLock", type: .dynamic, targets: ["YUKLock"]),
+    .library(name: "YUKLock", targets: ["YUKLock"]),
   ],
   targets: [
     .target(name: "YUKLock"),
