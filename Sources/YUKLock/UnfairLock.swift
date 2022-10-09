@@ -14,7 +14,7 @@ public struct UnfairLock<State>: _Locking, @unchecked Sendable {
   internal let __lock: ManagedLock
   
   @inlinable
-  public init(uncheckedState initialState: State) {
+  public init(uncheckedInitialState initialState: State) {
     __lock = .create(with: initialState)
   }
   
@@ -67,7 +67,7 @@ extension UnfairLock where State == Void {
   
   @inlinable
   public init() {
-    self.init(uncheckedState: ())
+    self.init(uncheckedInitialState: ())
   }
   
   @inlinable
@@ -119,7 +119,7 @@ extension UnfairLock where State: Sendable {
   
   @inlinable
   public init(initialState: State) {
-    self.init(uncheckedState: initialState)
+    self.init(uncheckedInitialState: initialState)
   }
 }
 
