@@ -2,38 +2,21 @@
 //  Locking.swift
 //  YUKLock
 //
-//  Created by Ruslan Lutfullin on 2/7/21.
+//  Created by Ruslan on 09/10/22.
 //
 
 // MARK: -
-public protocol Locking: AnyObject {
-  
-  func sync<R>(_ block: () throws -> R) rethrows -> R
-  
-  func trySync<R>(_ block: () throws -> R) rethrows -> R?
-  //
-  func locked() -> Bool
-  //
-  func lock()
-  
-  func unlock()
-  //
-  init()
-}
+internal protocol _Locking {
 
-extension Locking {
+  associatedtype State
   
-  @inlinable
-  public func sync<R>(_ block: () throws -> R) rethrows -> R {
-    lock()
-    defer { unlock() }
-    return try block()
-  }
+  init(uncheckedState initialState: State)
+
+  func withLockUnchecked<R>(_ body: (inout State) throws -> R) rethrows -> R
   
-  @inlinable
-  public func trySync<R>(_ block: () throws -> R) rethrows -> R? {
-    guard locked() else { return nil }
-    defer { unlock() }
-    return try block()
-  }
+  func withLock<R: Sendable>(_ body: @Sendable (inout State) throws -> R) rethrows -> R
+  
+  func withLockIfAvailableUnchecked<R>(_ body: (inout State) throws -> R) rethrows -> R?
+  
+  func withLockIfAvailable<R: Sendable>(_ body: @Sendable (inout State) throws -> R) rethrows -> R?
 }

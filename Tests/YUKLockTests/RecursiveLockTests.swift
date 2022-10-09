@@ -1,5 +1,5 @@
 //
-//  UnfairLockTests.swift
+//  RecursiveLockTests.swift
 //  YUKLockTests
 //
 //  Created by Lutfullin on 09/10/22.
@@ -9,16 +9,15 @@ import XCTest
 @testable import YUKLock
 
 // MARK: -
-internal final class UnfairLockTests: XCTestCase {
+internal final class RecursiveLockTests: XCTestCase {
   
   internal static var allTests = [
     ("testWithLockUnchecked", testWithLockUnchecked),
     ("testWithLockIfAvailableUnchecked", testWithLockIfAvailableUnchecked),
-    ("testPrecondition", testPrecondition),
   ]
   
   internal func testWithLockUnchecked() {
-    let lock = UnfairLock(initialState: 0)
+    let lock = RecursiveLock(initialState: 0)
     
     let dispatchBlockCount = 16
     let iterationCountPerBlock = 100_000
@@ -31,7 +30,9 @@ internal final class UnfairLockTests: XCTestCase {
         for _ in 0..<iterationCountPerBlock {
           lock.withLockUnchecked {
             $0 += 2
-            $0 -= 1
+            lock.withLockUnchecked {
+              $0 -= 1
+            }
           }
         }
         group.leave()
@@ -43,25 +44,14 @@ internal final class UnfairLockTests: XCTestCase {
   }
   
   internal func testWithLockIfAvailableUnchecked() {
-    let lock = UnfairLock(initialState: 0)
+    let lock = RecursiveLock(initialState: 0)
     
     lock.withLockIfAvailableUnchecked {
       $0 += 2
-      XCTAssertEqual(lock.withLockIfAvailableUnchecked { $0 += 2; $0 -= 1; return $0 }, nil)
+      XCTAssertEqual(lock.withLockIfAvailableUnchecked { $0 += 2; $0 -= 1; return $0 }, 3)
       $0 -= 1
     }
     
-    XCTAssertEqual(lock.withLockIfAvailableUnchecked { $0 }, 1)
-  }
-  
-  internal func testPrecondition() {
-    let lock = UnfairLock()
-    
-    lock.withLockUnchecked {
-      lock.precondition(.owner)
-    }
-    lock.precondition(.notOwner)
-    
-    XCTAssertTrue(true)
+    XCTAssertEqual(lock.withLockIfAvailableUnchecked { $0 }, 2)
   }
 }

@@ -1,5 +1,5 @@
 //
-//  UnfairLock.swift
+//  RecursiveLock.swift
 //  YUKLock
 //
 //  Created by Ruslan on 09/10/22.
@@ -8,7 +8,7 @@
 import Darwin
 
 // MARK: -
-public struct UnfairLock<State>: _Locking, @unchecked Sendable {
+public struct RecursiveLock<State>: _Locking, @unchecked Sendable {
   
   @usableFromInline
   internal let __lock: ManagedLock
@@ -21,7 +21,7 @@ public struct UnfairLock<State>: _Locking, @unchecked Sendable {
   @inlinable
   public func withLockUnchecked<R>(_ body: (inout State) throws -> R) rethrows -> R {
     return try __lock.withUnsafeMutablePointers { (header, lock) in
-      os_unfair_lock_lock(lock); defer { os_unfair_lock_unlock(lock) }
+      pthread_mutex_lock(lock); defer { pthread_mutex_unlock(lock) }
       return try body(&header.pointee)
     }
   }
@@ -34,7 +34,7 @@ public struct UnfairLock<State>: _Locking, @unchecked Sendable {
   @inlinable
   public func withLockIfAvailableUnchecked<R>(_ body: (inout State) throws -> R) rethrows -> R? {
     return try __lock.withUnsafeMutablePointers { (header, lock) in
-      guard os_unfair_lock_trylock(lock) else { return nil }; defer { os_unfair_lock_unlock(lock) }
+      guard pthread_mutex_trylock(lock) == 0 else { return nil }; defer { pthread_mutex_unlock(lock) }
       return try body(&header.pointee)
     }
   }
@@ -43,27 +43,9 @@ public struct UnfairLock<State>: _Locking, @unchecked Sendable {
   public func withLockIfAvailable<R: Sendable>(_ body: @Sendable (inout State) throws -> R) rethrows -> R? {
     return try withLockIfAvailableUnchecked(body)
   }
-  
-  @usableFromInline
-  internal func _preconditionTest(_ condition: Ownership) -> Bool {
-    __lock.withUnsafeMutablePointerToElements { (lock) in
-      switch condition {
-      case .owner:
-        os_unfair_lock_assert_owner(lock)
-      case .notOwner:
-        os_unfair_lock_assert_not_owner(lock)
-      }
-    }
-    return true
-  }
-  
-  @_transparent
-  public func precondition(_ condition: Ownership) {
-    Swift.precondition(_preconditionTest(condition), "lockPrecondition failure")
-  }
 }
 
-extension UnfairLock where State == Void {
+extension RecursiveLock where State == Void {
   
   @inlinable
   public init() {
@@ -94,7 +76,8 @@ extension UnfairLock where State == Void {
   @inlinable
   public func lock() {
     __lock.withUnsafeMutablePointerToElements { (lock) in
-      os_unfair_lock_lock(lock)
+      guard pthread_mutex_lock(lock) == 0 else { preconditionFailure() }
+      return
     }
   }
   
@@ -102,7 +85,8 @@ extension UnfairLock where State == Void {
   @inlinable
   public func unlock() {
     __lock.withUnsafeMutablePointerToElements { (lock) in
-      os_unfair_lock_unlock(lock)
+      pthread_mutex_unlock(lock)
+      return
     }
   }
   
@@ -110,12 +94,12 @@ extension UnfairLock where State == Void {
   @inlinable
   public func lockIfAvailable() -> Bool {
     return __lock.withUnsafeMutablePointerToElements { (lock) in
-      return os_unfair_lock_trylock(lock)
+      return pthread_mutex_trylock(lock) == 0
     }
   }
 }
 
-extension UnfairLock where State: Sendable {
+extension RecursiveLock where State: Sendable {
   
   @inlinable
   public init(initialState: State) {
@@ -123,17 +107,25 @@ extension UnfairLock where State: Sendable {
   }
 }
 
-extension UnfairLock {
+extension RecursiveLock {
   
   // MARK: -
   @usableFromInline
-  internal final class ManagedLock: ManagedBuffer<State, os_unfair_lock_s> {
+  internal final class ManagedLock: ManagedBuffer<State, pthread_mutex_t> {
     
     @inlinable
     internal class func create(with initialState: State) -> Self {
       let `self` = create(minimumCapacity: 1) { (buffer) in
         buffer.withUnsafeMutablePointerToElements { (lock) in
-          lock.initialize(to: .init())
+          let attr = UnsafeMutablePointer<pthread_mutexattr_t>.allocate(capacity: 1)
+          defer {
+            guard pthread_mutexattr_destroy(attr) == 0 else { preconditionFailure("'pthread_mutexattr_destroy' failure") }
+            attr.deinitialize(count: 1)
+            attr.deallocate()
+          }
+          guard pthread_mutexattr_init(attr) == 0 else { preconditionFailure("'pthread_mutexattr_init' failure") }
+          guard pthread_mutexattr_settype(attr, PTHREAD_MUTEX_RECURSIVE) == 0 else { preconditionFailure("'pthread_mutexattr_settype' failure") }
+          guard pthread_mutex_init(lock, attr) == 0 else { preconditionFailure("'pthread_mutex_init' failure") }
         }
         return initialState
       }
@@ -143,18 +135,10 @@ extension UnfairLock {
     @inlinable
     deinit {
       withUnsafeMutablePointerToElements { (lock) in
+        guard pthread_mutex_destroy(lock) == 0 else { preconditionFailure("'pthread_mutex_destroy' failure")}
         lock.deinitialize(count: 1)
         return
       }
     }
-  }
-}
-
-extension UnfairLock {
-  
-  // MARK: -
-  public enum Ownership: Hashable, Sendable {
-    case owner
-    case notOwner
   }
 }
