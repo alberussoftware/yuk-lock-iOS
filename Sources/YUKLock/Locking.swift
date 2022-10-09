@@ -10,7 +10,7 @@ internal protocol _Locking {
 
   associatedtype State
   
-  init(uncheckedState initialState: State)
+  init(uncheckedInitialState initialState: State)
 
   func withLockUnchecked<R>(_ body: (inout State) throws -> R) rethrows -> R
   
