@@ -1,5 +1,7 @@
 # YUKLock
 
+Helper wrappers around ```os_unfair_lock_s``` and ```pthread_mutex_t``` for iOS and macOS.
+
 ## Installation
 
 ### Swift Package Manager
