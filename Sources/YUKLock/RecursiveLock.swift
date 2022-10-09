@@ -14,7 +14,7 @@ public struct RecursiveLock<State>: _Locking, @unchecked Sendable {
   internal let __lock: ManagedLock
   
   @inlinable
-  public init(uncheckedState initialState: State) {
+  public init(uncheckedInitialState initialState: State) {
     __lock = .create(with: initialState)
   }
   
@@ -49,7 +49,7 @@ extension RecursiveLock where State == Void {
   
   @inlinable
   public init() {
-    self.init(uncheckedState: ())
+    self.init(uncheckedInitialState: ())
   }
   
   @inlinable
@@ -76,7 +76,7 @@ extension RecursiveLock where State == Void {
   @inlinable
   public func lock() {
     __lock.withUnsafeMutablePointerToElements { (lock) in
-      guard pthread_mutex_lock(lock) == 0 else { preconditionFailure() }
+      pthread_mutex_lock(lock)
       return
     }
   }
@@ -103,7 +103,7 @@ extension RecursiveLock where State: Sendable {
   
   @inlinable
   public init(initialState: State) {
-    self.init(uncheckedState: initialState)
+    self.init(uncheckedInitialState: initialState)
   }
 }
 
